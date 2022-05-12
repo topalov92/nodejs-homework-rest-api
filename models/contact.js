@@ -20,9 +20,8 @@ const contactSchema = Schema({
     },
 }, { versionKey: false, timestamps: true });
 
-const joiShema=Joi.object({
+const joiShema = Joi.object({
         name: Joi.string()
-            // .alphanum()
             .min(3)
             .max(30)
             .regex(
