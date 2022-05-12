@@ -1,6 +1,6 @@
 {
-  "name": "template",
-  "version": "0.0.0",
+  "name": "hw03",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./server.js",
