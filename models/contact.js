@@ -1,67 +1,58 @@
-// const fs = require('fs/promises')
 
-const crypto = require('crypto');
-const DB = require('./db');
-const db = new DB('contacts.json');
+const { Schema, model } = require('mongoose');
+const Joi = require('joi');
 
-const listContacts = async () => {
-  return await db.read();
-};
+const contactSchema = Schema({
+    name: {
+        type: String,
+        required: [true, 'Set name for contact'],
+    },
+    email: {
+        type: String,
+        required: true,
+    },
+    phone: {
+        type: String,
+        required: true,
+    },
+    favorite: {
+        type: Boolean,
+        default: false,
+    },
+}, { versionKey: false, timestamps: true });
 
-const getContactById = async contactId => {
-  const contacts = await db.read();
-  const [contact] = contacts.filter(({ id }) => id === contactId);
+const joiShema = Joi.object({
+        name: Joi.string()
+            .min(3)
+            .max(30)
+            .regex(
+                /^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/,
+                "Name can only consist of letters, apostrophes, dashes and spaces."
+            )
+            .required(),
+        email: Joi.string()
+            .email()
+            .required(),
+        phone: Joi.string()
+            .min(10)
+            .max(18)
+            .pattern(/^[+]?[0-9]?[-.\s]?[(]?[0-9]{1,3}?[)]?[-.\s]?[0-9]{1,4}[-.\s]?[0-9]{1,4}[-.\s]?[0-9]{1,9}$/)
+            .message('Enter the phone in the following format (***) ***-****')
+            .required(),
+        favorite: Joi.boolean()
+            .optional()
+    })
 
-  return contact;
-};
+const favoriteJoiShema = Joi.object({
+    favorite: Joi.boolean()
+        .required()
+})
 
-const removeContact = async contactId => {
-  const contacts = await db.read();
-  const contactIndex = contacts.findIndex(({ id }) => id === contactId);
-
-  if (contactIndex === -1) {
-    return null;
-  }
-
-  const [result] = contacts.splice(contactIndex, 1);
-  await db.write(contacts);
-
-  return [result];
-};
-
-const addContact = async body => {
-  const contacts = await db.read();
-  const newContact = {
-    id: crypto.randomUUID(),
-    isFavorite: false,
-    ...body,
-  };
-
-  contacts.push(newContact);
-
-  await db.write(contacts);
-
-  return newContact;
-};
-
-const updateContact = async (contactId, body) => {
-  const contacts = await db.read();
-  const contactIndex = contacts.findIndex(({ id }) => id === contactId);
-
-  if (contactIndex === -1) {
-    return null;
-  }
-
-  contacts[contactIndex] = { ...contacts[contactIndex], ...body };
-  await db.write(contacts);
-
-  return contacts[contactIndex];
-};
+const Contact = model("contact", contactSchema);
 
 module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-}
+    Contact,
+    joiShema,
+    favoriteJoiShema
+};
+
