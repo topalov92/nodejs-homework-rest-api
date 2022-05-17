@@ -1,16 +1,14 @@
 const { Contact } = require('../../models')
+const { NotFound } = require("http-errors")
 
 const updateContactStatus = async (req, res) => {
   const { contactId } = req.params;
   const { favorite } = req.body;
-  const result = await Contact.findByIdAndUpdate(contactId, {favorite}, {new:true})
+  const { _id } = req.user;
+  const result = await Contact.findByIdAndUpdate({ _id: contactId, owner: _id }, {favorite}, {new:true}).populate("owner", "_id email subscription");
   
   if (!result) {
-    return res.status(404).json({
-      status: "error",
-      code: 404,
-      message: `Contact with id= ${contactId} not found`
-    })
+     throw new NotFound(`Contact with id= ${contactId} not found`);
   }
   
   res.json({
