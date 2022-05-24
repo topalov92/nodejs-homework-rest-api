@@ -1,12 +1,13 @@
 const current = async (req, res) => {
-    const { email, subscription } = req.user;
+    const { email, subscription, avatarURL } = req.user;
     res.json({
         status: "success",
         code: 200,
         data: {
             user: {
                 email,
-                subscription
+                subscription,
+                avatarURL
             }
         }
     })
