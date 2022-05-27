@@ -4,6 +4,8 @@ const logout = require("./logout");
 const current = require("./current");
 const subscription = require("./subscription");
 const avatar = require("./avatar");
+const verifyEmail = require("./verifyEmail");
+const secondVerifyEmail = require("./secondVerifyEmail");
 
 module.exports = {
   signup,
@@ -12,4 +14,6 @@ module.exports = {
   current,
   subscription,
   avatar,
+  verifyEmail,
+  secondVerifyEmail,
 };
